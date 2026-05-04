@@ -54,14 +54,16 @@ begin
 alu : process(i_A, i_B, i_op)
     variable A : unsigned(8 downto 0);
     variable B : unsigned(8 downto 0);
+    variable notB : unsigned(8 downto 0);
 
     begin
         A := unsigned('0' & i_A);
         B := unsigned('0' & i_B);
+        notB := unsigned(not('0' & i_B));
         
         case i_op is    
             when "000" => result_9 <= std_logic_vector(A+B); --add
-            when "001" => result_9 <= std_logic_vector(A-B); --subtract
+            when "001" => result_9 <= std_logic_vector(A + notB + 1); --subtract
             when "010" => result_9 <= '0' & (i_A and i_B); --and
             when "011" => result_9 <= '0' & (i_A or i_B); --or
             when others => result_9 <= '0' & i_A;
