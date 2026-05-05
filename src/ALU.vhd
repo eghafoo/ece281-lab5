@@ -55,7 +55,8 @@ alu : process(i_A, i_B, i_op)
     variable A : unsigned(8 downto 0);
     variable B : unsigned(8 downto 0);
     variable notB : unsigned(8 downto 0);
-
+    variable v_result_9 : std_logic_vector(8 downto 0);
+    variable v_result_8 : std_logic_vector(7 downto 0);
     begin
         A := unsigned('0' & i_A);
         B := unsigned('0' & i_B);
@@ -68,22 +69,28 @@ alu : process(i_A, i_B, i_op)
             when "011" => result_9 <= '0' & (i_A or i_B); --or
             when others => result_9 <= '0' & i_A;
         end case; 
+        v_result_8 := v_result_9(7 downto 0);
+
+    flag_N <= v_result_8(7);
+
+    if v_result_8 = x"00" then
+        flag_Z <= '1';
+    else
+        flag_Z <= '0';
+    end if;
+
+    flag_C <= v_result_9(8);
+    case i_op is
+        when "000" => flag_V <= (not (i_A(7) xor i_B(7))) and (i_A(7) xor v_result_8(7));
+        when "001" => flag_V <= (i_A(7) xor i_B(7)) and (i_A(7) xor v_result_8(7));
+        when others => flag_V <= '0';
+    end case;
+    result_9 <= v_result_9;
+    result_8 <= v_result_8;
 end process alu;
 result_8 <= result_9 (7 downto 0);
 
-flag_N <= result_8(7);
-flag_Z <= '1' when result_8 = x"00" else '0';
-flag_C <= result_9(8);
-overflow_flag : process(i_A, i_B, i_op,result_8)
-begin
-        case i_op is
-            when "000" => flag_V <= (not (i_A(7) xor i_B(7))) and (i_A(7) xor result_8(7)); 
-            when "001" => flag_V <= (i_A(7) xor i_B(7)) and (i_A(7) xor result_8(7)); 
-            when others => flag_V <= '0';
-        end case;
-    end process overflow_flag;
-
-    o_result <= result_8;
-    o_flags <= flag_N & flag_Z & flag_C & flag_V;
+o_result <= result_8;
+o_flags <= flag_N & flag_Z & flag_C & flag_V;
 
 end Behavioral;
