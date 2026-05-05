@@ -53,7 +53,7 @@ alu : process(i_A, i_B, i_op)
         
         case i_op is    
             when "000" => v_result_9 := std_logic_vector(A + B);
-            when "001" => v_result_9 := std_logic_vector(A + notB + 1);
+            when "001" => v_result_9 := std_logic_vector(A + notB + to_unsigned(1, 9));
             when "010" => v_result_9 := '0' & (i_A and i_B);
             when "011" => v_result_9 := '0' & (i_A or i_B);
             when others => v_result_9 := '0' & i_A;
